@@ -11,9 +11,9 @@ buildscript {
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: 'eclipse-wtp'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
 
 
 group 'pl.mzakrze'
@@ -34,6 +34,8 @@ configurations {
 dependencies {
     compile group: 'com.google.guava', name: 'guava', version: 'r05'
     compile('org.springframework.boot:spring-boot-starter-data-rest')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-security')
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile 'commons-validator:commons-validator:1.4.1'
     compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
