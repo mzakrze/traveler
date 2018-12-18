@@ -1,0 +1,42 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.9.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+
+group 'pl.mzakrze'
+version = rootProject.file('VERSION').text.trim()
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    providedRuntime
+}
+
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: 'r05'
+    compile('org.springframework.boot:spring-boot-starter-data-rest')
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    compile 'commons-validator:commons-validator:1.4.1'
+    compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
+    runtime('org.springframework.boot:spring-boot-devtools')
+
+}
