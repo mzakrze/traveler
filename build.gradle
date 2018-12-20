@@ -40,5 +40,9 @@ dependencies {
     compile 'commons-validator:commons-validator:1.4.1'
     compile group: 'commons-httpclient', name: 'commons-httpclient', version: '3.1'
     runtime('org.springframework.boot:spring-boot-devtools')
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
+
 
 }
