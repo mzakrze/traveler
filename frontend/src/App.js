@@ -1,28 +1,22 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import './App.css';
+import LeafletComponent from './components/LeafletComponent.js';
+import FormComponent from './components/FormComponent.js';
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+    render() {
+        return  <div>
+           <h2> Title to be done </h2>
+           <span>
+               <div style={{display:'inline-block', marginRight:'20px'}}>
+                   <LeafletComponent />
+               </div>
+               <div style={{display:'inline-block', width: '600px'}}>
+                   <FormComponent />
+               </div>
+           </span>
+        </div>;
+    }
 }
 
 export default App;
