@@ -37,8 +37,13 @@ export default class FormComponent extends Component {
             let data = {
                 placesOfInterest: this.state.checkedCheckboxes
             }
-            // FIXME
-            console.log(data);
+            fetch('/api/stub/simple_map_req')
+              .then(function(response) {
+                return response.json();
+              })
+              .then(function(myJson) {
+                console.log(JSON.stringify(myJson));
+              });
         }
         return <button type="button" onClick={send}>Ok - find optimal route</button>
     }

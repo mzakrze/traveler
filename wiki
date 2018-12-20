@@ -1,0 +1,6 @@
+Google Cloud Platform - zarządzanie kontem
+https://console.cloud.google.com/google/maps-apis/apis/places-backend.googleapis.com/metrics?project=traveler-1544546403365
+
+
+Developer guide - Places API
+https://developers.google.com/places/web-service/search
