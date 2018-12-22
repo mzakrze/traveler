@@ -64,7 +64,14 @@ export default class FormComponent extends Component {
                 startLocation: this.state.startLocation,
                 endLocation: this.state.endLocation
             }
-            fetch('/api/stub/simple_map_req', {method: 'POST', body: JSON.stringify(data)})
+            fetch('/api/maps/find_route', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                      'Accept': 'application/json',
+                      'Content-Type': 'application/json'
+                },
+            })
                 .then(function(response) {
                     return response.json();
                 })

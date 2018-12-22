@@ -15,4 +15,4 @@ local_deploy: clean build
 
 heroku_deploy: clean build
 	heroku war:deploy build/libs/Traveler-0.0.1-SNAPSHOT.war --app spdb-traveler-app
-	google-chrome https://spdb-traveler-app.herokuapp.com/api/stub/simple_json
+	google-chrome https://spdb-traveler-app.herokuapp.com
