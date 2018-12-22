@@ -1,7 +1,7 @@
 build:
 	cd frontend; make build
 	cd frontend; cp -R build/* ../src/main/resources/public
-	cd src/main/resources/secrets; gpg2 -d google_api_key.gpg
+	cd src/main/resources/secrets; gpg2 --output google_api_key -d google_api_key.gpg
 	./gradlew build
 	-rm src/main/resources/secrets/google_api_keys
 
