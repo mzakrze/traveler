@@ -6,10 +6,50 @@ const L = window.L;
 
 export default class LeafletComponent extends Component {
 
+    mymap: any;
+    startLocationPopup: any;
+    endLocationPopup: any;
+
+    constructor(props) {
+        super(props);
+        this.startLocationPopup = null;
+        this.endLocationPopup = null;
+        this.state = { };
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+        const popupOptions = {
+            closeOnClick: false,
+            autoClose: false
+        };
+
+        if(this.props.startLocation !== nextProps.startLocation) {
+            if(this.startLocationPopup != null) {
+                this.mymap.removeLayer(this.startLocationPopup)
+            }
+            this.startLocationPopup = new L.popup(popupOptions)
+                    .setLatLng(nextProps.startLocation)
+                    .setContent('Start location');
+            this.startLocationPopup.openOn(this.mymap);
+        }
+
+        if(this.props.endLocation !== nextProps.endLocation) {
+            if(this.endLocationPopup != null) {
+                this.mymap.removeLayer(this.endLocationPopup)
+            }
+            this.endLocationPopup = new L.popup(popupOptions)
+                    .setLatLng(nextProps.endLocation)
+                    .setContent('End location');
+            this.endLocationPopup.openOn(this.mymap);
+        }
+    }
+
+
     componentDidMount(){
         console.log('leaflet component componentdidmount')
 
-        var mymap = L.map('leaftlet-map-id',{
+        this.mymap = L.map('leaftlet-map-id',{
             contextmenu: true,
             contextmenuWidth: 140,
             contextmenuItems: [{
@@ -24,35 +64,20 @@ export default class LeafletComponent extends Component {
                 '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
                 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             id: 'mapbox.streets'
-        }).addTo(mymap);
+        }).addTo(this.mymap);
 
-        L.marker([51.5, -0.09]).addTo(mymap)
+        L.marker([51.5, -0.09]).addTo(this.mymap)
             .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-
-        L.circle([51.508, -0.11], 500, {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.5
-        }).addTo(mymap).bindPopup("I am a circle.");
-
-        L.polygon([
-            [51.509, -0.08],
-            [51.503, -0.06],
-            [51.51, -0.047]
-        ]).addTo(mymap).bindPopup("I am a polygon.");
-
 
         var popup = L.popup();
 
-        function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent("You clicked the map at " + e.latlng.toString())
-                .openOn(mymap);
+        let onMapClick = (e) => {
+            this.props.handleClickOnMap(e.latlng);
         }
 
-        mymap.on('click', onMapClick);
+        this.mymap.on('click', onMapClick);
     }
+
 
     render() {
         return <div id="leaftlet-map-id">Hello there, its leaflet component</div>;
