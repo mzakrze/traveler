@@ -1,13 +1,13 @@
 package pl.mzakrze.traveler.api;
 
 public class FindRouteResponse {
-    public String response;
+    public String directions;
 
-    public String getResponse() {
-        return response;
+    public String getDirections() {
+        return directions;
     }
 
-    public void setResponse(String response) {
-        this.response = response;
+    public void setDirections(String directions) {
+        this.directions = directions;
     }
 }

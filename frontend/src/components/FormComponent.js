@@ -35,6 +35,7 @@ export default class FormComponent extends Component {
                 this.props.notifyNewEndLocation(nextProps.lastMapClickCoords);
             }
         }
+
     }
 
     renderCheckbox(name: string) {
@@ -72,11 +73,11 @@ export default class FormComponent extends Component {
                       'Content-Type': 'application/json'
                 },
             })
-                .then(function(response) {
+                .then((response) => {
                     return response.json();
                 })
-                .then(function(myJson) {
-                    console.log(JSON.stringify(myJson));
+                .then((response) => {
+                    this.props.notifyFindRouteResult(response);
                 });
         }
         return <button type="button" onClick={send}>Ok - find optimal route</button>

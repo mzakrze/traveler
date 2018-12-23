@@ -43,7 +43,7 @@ public class FindRouteAlgorithm {
         List<Location> pointsAlong = Arrays.asList(l1, l2, l3);
 
         FindRouteResponse result = new FindRouteResponse();
-        result.response = directionsApiFacade.fetch(start, end, pointsAlong);
+        result.directions = directionsApiFacade.fetch(start, end, pointsAlong);
 
         return result;
     }

@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 
+
 // Leaflet sources from CDN
-import './LeafletComponent.css'; 
+import './LeafletComponent.css';
 const L = window.L;
+
+var polyUtil = require('polyline-encoded');
 
 export default class LeafletComponent extends Component {
 
@@ -43,20 +46,45 @@ export default class LeafletComponent extends Component {
                     .setContent('End location');
             this.endLocationPopup.openOn(this.mymap);
         }
+
+
+        if(this.props.findRouteResultRev != nextProps.findRouteResultRev) {
+
+            this.plotFindRoutesResponse(nextProps.findRouteResult);
+
+        }
+    }
+
+    plotFindRoutesResponse(result) {
+
+        let randomColor = () => {
+            const possible = "0123456789abcdef";
+            let r = () => possible[Math.floor(Math.random() * 16)];
+            return "#" + r() + r() + r();
+        }
+
+        let route = result.directions.routes[0];
+
+        for(let leg of route.legs) {
+
+            let legColor = randomColor();
+
+            for(let s of leg.steps) {
+                var polyline = polyUtil.decode(s.polyline.points, 5);
+
+                var leaftletPolyline = new L.polyline(polyline, {color: legColor});
+
+                this.mymap.addLayer(leaftletPolyline);
+
+                leaftletPolyline.bindTooltip("TODO Polyline  tooltip content: " + legColor);
+            }
+        }
     }
 
 
     componentDidMount(){
-        console.log('leaflet component componentdidmount')
-
-        this.mymap = L.map('leaftlet-map-id',{
-            contextmenu: true,
-            contextmenuWidth: 140,
-            contextmenuItems: [{
-                text: 'Show coordinates',
-                callback: () => {console.log('im in callback')}
-            }]
-	    }).setView([51.505, -0.09], 13);
+//        this.mymap = L.map('leaftlet-map-id').setView([52.218994864793, 21.011712029573467], 17); // coordsy elki
+        this.mymap = L.map('leaftlet-map-id').setView([51.505, -0.09], 13);
 
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
@@ -65,11 +93,6 @@ export default class LeafletComponent extends Component {
                 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             id: 'mapbox.streets'
         }).addTo(this.mymap);
-
-        L.marker([51.5, -0.09]).addTo(this.mymap)
-            .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
-
-        var popup = L.popup();
 
         let onMapClick = (e) => {
             this.props.handleClickOnMap(e.latlng);
@@ -80,7 +103,7 @@ export default class LeafletComponent extends Component {
 
 
     render() {
-        return <div id="leaftlet-map-id">Hello there, its leaflet component</div>;
+        return <div id="leaftlet-map-id" />;
     }
 }
 

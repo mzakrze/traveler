@@ -3,6 +3,10 @@ import logo from './logo.svg';
 import LeafletComponent from './components/LeafletComponent.js';
 import FormComponent from './components/FormComponent.js';
 
+type FindRouteResult = {
+    directions: string,
+}
+
 class App extends Component {
 
     props: Props;
@@ -14,6 +18,8 @@ class App extends Component {
             lastMapClickCoords: null,
             startLocation: null,
             endLocation: null,
+            findRouteResult: null,
+            findRouteResultRev: 0,
         }
     }
 
@@ -35,6 +41,17 @@ class App extends Component {
         });
     }
 
+    handleFindRouteResult(result: FindRouteResult) {
+        let rev = this.state.findRouteResultRev + 1;
+        let res = {
+            directions: JSON.parse(result.directions)
+        }
+        this.setState({
+            findRouteResult: res,
+            findRouteResultRev: rev,
+        });
+    }
+
     render() {
         return  <div>
            <h2> Title to be done </h2>
@@ -44,6 +61,8 @@ class App extends Component {
                         handleClickOnMap={this.handleClickOnMap.bind(this)}
                         startLocation={this.state.startLocation}
                         endLocation={this.state.endLocation}
+                        findRouteResult={this.state.findRouteResult}
+                        findRouteResultRev={this.state.findRouteResultRev}
                         />
                </div>
                <div style={{display:'inline-block', width: '600px'}}>
@@ -51,6 +70,7 @@ class App extends Component {
                         lastMapClickCoords={this.state.lastMapClickCoords}
                         notifyNewStartLocation={this.handleNewStartLocation.bind(this)}
                         notifyNewEndLocation={this.handleNewEndLocation.bind(this)}
+                        notifyFindRouteResult={this.handleFindRouteResult.bind(this)}
                          />
                </div>
            </span>
