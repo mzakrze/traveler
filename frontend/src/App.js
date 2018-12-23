@@ -5,6 +5,7 @@ import FormComponent from './components/FormComponent.js';
 
 type FindRouteResult = {
     directions: string,
+    places: string
 }
 
 class App extends Component {
@@ -44,7 +45,8 @@ class App extends Component {
     handleFindRouteResult(result: FindRouteResult) {
         let rev = this.state.findRouteResultRev + 1;
         let res = {
-            directions: JSON.parse(result.directions)
+            directions: JSON.parse(result.directions),
+            places: JSON.parse(result.places)
         }
         this.setState({
             findRouteResult: res,

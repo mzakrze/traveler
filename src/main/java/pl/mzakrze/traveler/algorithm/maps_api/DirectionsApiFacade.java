@@ -16,22 +16,26 @@ import java.util.List;
  * @See https://developers.google.com/maps/documentation/directions/intro
  */
 @Component
-public class DirectionsApiFacade {
+public class DirectionsApiFacade extends BaseApiFacade {
+
+    public final static String BASE_URL = "https://maps.googleapis.com/maps/api/directions/json?";
 
     // settings
     public final static String MODE = "walking";
 
-
-    public final static String BASE_URL = "https://maps.googleapis.com/maps/api/directions/json?";
+    String cache = null; // for dev purposes only (limit quotas)
 
     @Autowired
-    private GoogleApiKeyProvider googleApiKeyProvider;
+    private GoogleApiKeyProvider googleApiKeyProvider;  
 
     public String fetch(Location start, Location end, List<Location> waypoints) {
 
         String reqUrl = buildRequestUrl(start, end, waypoints);
 
-        return execute(reqUrl);
+        if(this.cache == null) {
+            this.cache = execute(reqUrl);
+        }
+        return this.cache;
     }
 
     private String buildRequestUrl(Location start, Location end, List<Location> waypoints) {
@@ -54,26 +58,4 @@ public class DirectionsApiFacade {
 
         return urlBuilder.toString();
     }
-
-    private String execute(String reqUrl) {
-        final HttpClient client = new HttpClient();
-        final HttpMethod method = new GetMethod(reqUrl);
-        try
-        {
-            final int status = client.executeMethod(method);
-            if ( status != HttpStatus.SC_OK )
-            {
-                throw new RuntimeException ( "Method failed with error " + status + " " + method.getStatusLine () );
-            }
-            return method.getResponseBodyAsString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally
-        {
-            method.releaseConnection ();
-        }
-        return null;
-    }
-
-
 }

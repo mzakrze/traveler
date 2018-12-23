@@ -3,6 +3,7 @@ package pl.mzakrze.traveler.algorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.maps_api.DirectionsApiFacade;
+import pl.mzakrze.traveler.algorithm.maps_api.NearbySearchPlacesApiFacade;
 import pl.mzakrze.traveler.api.FindRouteRequest;
 import pl.mzakrze.traveler.api.FindRouteResponse;
 
@@ -16,10 +17,15 @@ public class FindRouteAlgorithm {
     @Autowired
     DirectionsApiFacade directionsApiFacade;
 
+    @Autowired
+    NearbySearchPlacesApiFacade nearbySearchPlacesApiFacade;
+
     public FindRouteResponse handleFindRouteRequest(FindRouteRequest req) {
+        FindRouteResponse result = new FindRouteResponse();
 
         // 1. Fetch places from api
-        // TODO
+        String fetchedPlaces = nearbySearchPlacesApiFacade.fetch(req);
+        result.places = fetchedPlaces;
 
         // 2. Fetch distances between those places from api
         // TODO
@@ -42,7 +48,6 @@ public class FindRouteAlgorithm {
         Location l3 = new Location(new BigDecimal("51.50948700405906"), new BigDecimal("-0.06797671322601674"));
         List<Location> pointsAlong = Arrays.asList(l1, l2, l3);
 
-        FindRouteResponse result = new FindRouteResponse();
         result.directions = directionsApiFacade.fetch(start, end, pointsAlong);
 
         return result;

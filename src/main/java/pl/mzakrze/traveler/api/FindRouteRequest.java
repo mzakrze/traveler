@@ -1,20 +1,21 @@
 package pl.mzakrze.traveler.api;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class FindRouteRequest {
-    String[] placesOfInterest;
+    List<String> placesOfInterest;
     Location endLocation;
     Location startLocation;
 
     public FindRouteRequest() {
     }
 
-    public String[] getPlacesOfInterest() {
+    public List<String> getPlacesOfInterest() {
         return placesOfInterest;
     }
 
-    public void setPlacesOfInterest(String[] placesOfInterest) {
+    public void setPlacesOfInterest(List<String> placesOfInterest) {
         this.placesOfInterest = placesOfInterest;
     }
 
@@ -46,9 +47,9 @@ public class FindRouteRequest {
         return sb.toString();
     }
 
-    static class Location {
-        BigDecimal lat;
-        BigDecimal lng;
+    public static class Location {
+        public BigDecimal lat;
+        public BigDecimal lng;
 
         public Location() {
         }

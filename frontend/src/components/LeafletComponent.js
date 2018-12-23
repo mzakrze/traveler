@@ -79,6 +79,26 @@ export default class LeafletComponent extends Component {
                 leaftletPolyline.bindTooltip("TODO Polyline  tooltip content: " + legColor);
             }
         }
+
+        // -----------------------------------------------------
+
+        let places = result.places;
+
+        for(let r of places.results) {
+
+            let latlng = r.geometry.location;
+            let name = r.name;
+
+            let p = new L.popup({
+                    closeOnClick: false,
+                    autoClose: false
+                })
+                .setLatLng(latlng)
+                .setContent(name);
+
+            p.openOn(this.mymap);
+        }
+
     }
 
 
