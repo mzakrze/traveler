@@ -16,7 +16,7 @@ public class GoogleApiKeyProvider {
 
     public String getGoogleApiKey(){
         try {
-            return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name());
+            return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8.name()).trim();
         } catch (IOException e) {
             e.printStackTrace();
             return null;

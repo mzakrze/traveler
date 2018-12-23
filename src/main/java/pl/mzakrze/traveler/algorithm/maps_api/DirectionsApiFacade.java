@@ -35,6 +35,7 @@ public class DirectionsApiFacade {
     }
 
     private String buildRequestUrl(Location start, Location end, List<Location> waypoints) {
+        final String pipSignEncoded = "%7C";
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
         urlBuilder.append("origin=" + start.lat + "," + start.lng);
         urlBuilder.append("&destination=" + end.lat + "," + end.lng);
@@ -46,8 +47,8 @@ public class DirectionsApiFacade {
             Location p = waypoints.get(i);
             urlBuilder.append(p.lat + "," + p.lng);
 
-            if(i - 1 != waypoints.size()) {
-                urlBuilder.append("|");
+            if(i != waypoints.size() - 1) {
+                urlBuilder.append(pipSignEncoded);
             }
         }
 
