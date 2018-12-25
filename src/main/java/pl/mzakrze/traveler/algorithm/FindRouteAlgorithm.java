@@ -1,15 +1,19 @@
 package pl.mzakrze.traveler.algorithm;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.maps_api.DirectionsApiFacade;
 import pl.mzakrze.traveler.algorithm.maps_api.NearbySearchPlacesApiFacade;
+import pl.mzakrze.traveler.algorithm.maps_api.PlaceDetailsApiFacade;
+import pl.mzakrze.traveler.algorithm.maps_api.model.NearbySeachPlacesApiResponse;
+import pl.mzakrze.traveler.algorithm.maps_api.model.PlaceDetailsApiResponse;
 import pl.mzakrze.traveler.api.FindRouteRequest;
 import pl.mzakrze.traveler.api.FindRouteResponse;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class FindRouteAlgorithm {
@@ -20,18 +24,28 @@ public class FindRouteAlgorithm {
     @Autowired
     NearbySearchPlacesApiFacade nearbySearchPlacesApiFacade;
 
+    @Autowired
+    PlaceDetailsApiFacade placeDetailsApiFacade;
+
     public FindRouteResponse handleFindRouteRequest(FindRouteRequest req) {
+        Gson gson = new Gson();
+
         FindRouteResponse result = new FindRouteResponse();
 
         // 1. Fetch places from api
-        String fetchedPlaces = nearbySearchPlacesApiFacade.fetch(req);
-        result.places = fetchedPlaces;
+        result.places = nearbySearchPlacesApiFacade.fetch(req);
+        NearbySeachPlacesApiResponse fetchedPlaces = gson.fromJson(result.places, NearbySeachPlacesApiResponse.class);
+
+        List<String> placesIds = fetchedPlaces.results.stream().map(e -> e.getPlace_id()).collect(Collectors.toList());
 
         // 2. Fetch distances between those places from api
         // TODO
 
         // 3. Fetch places details from api
-        // TODO
+        Map<String, PlaceDetailsApiResponse> placeId2DetailsMap = placesIds.stream()
+                .collect(Collectors.toMap(
+                        placeId -> placeId,
+                        placeId -> gson.fromJson(placeDetailsApiFacade.fetch(placeId), PlaceDetailsApiResponse.class)));
 
         // 4. Create graph representation
         // TODO

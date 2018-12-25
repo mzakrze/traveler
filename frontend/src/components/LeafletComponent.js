@@ -84,6 +84,8 @@ export default class LeafletComponent extends Component {
 
         let places = result.places;
 
+        console.log(places)
+
         for(let r of places.results) {
 
             let latlng = r.geometry.location;
