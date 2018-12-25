@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.maps_api.DirectionsApiFacade;
+import pl.mzakrze.traveler.algorithm.maps_api.DistanceMatrixApiFacade;
 import pl.mzakrze.traveler.algorithm.maps_api.NearbySearchPlacesApiFacade;
 import pl.mzakrze.traveler.algorithm.maps_api.PlaceDetailsApiFacade;
 import pl.mzakrze.traveler.algorithm.maps_api.model.NearbySeachPlacesApiResponse;
@@ -27,6 +28,9 @@ public class FindRouteAlgorithm {
     @Autowired
     PlaceDetailsApiFacade placeDetailsApiFacade;
 
+    @Autowired
+    DistanceMatrixApiFacade distanceMatrixApiFacade;
+
     public FindRouteResponse handleFindRouteRequest(FindRouteRequest req) {
         Gson gson = new Gson();
 
@@ -39,7 +43,7 @@ public class FindRouteAlgorithm {
         List<String> placesIds = fetchedPlaces.results.stream().map(e -> e.getPlace_id()).collect(Collectors.toList());
 
         // 2. Fetch distances between those places from api
-        // TODO
+        DistanceMatrixApiFacade.DistanceMatrix distanceMatrix = distanceMatrixApiFacade.fetch(placesIds);
 
         // 3. Fetch places details from api
         Map<String, PlaceDetailsApiResponse> placeId2DetailsMap = placesIds.stream()

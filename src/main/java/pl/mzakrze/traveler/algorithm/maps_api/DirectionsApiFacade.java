@@ -39,7 +39,7 @@ public class DirectionsApiFacade extends BaseApiFacade {
     }
 
     private String buildRequestUrl(Location start, Location end, List<Location> waypoints) {
-        final String pipSignEncoded = "%7C";
+        final String pipeSignEncoded = "%7C";
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
         urlBuilder.append("origin=" + start.lat + "," + start.lng);
         urlBuilder.append("&destination=" + end.lat + "," + end.lng);
@@ -52,7 +52,7 @@ public class DirectionsApiFacade extends BaseApiFacade {
             urlBuilder.append(p.lat + "," + p.lng);
 
             if(i != waypoints.size() - 1) {
-                urlBuilder.append(pipSignEncoded);
+                urlBuilder.append(pipeSignEncoded);
             }
         }
 

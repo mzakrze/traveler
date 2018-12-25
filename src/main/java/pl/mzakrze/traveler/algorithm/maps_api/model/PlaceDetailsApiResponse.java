@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class PlaceDetailsApiResponse {
-    String html_attributions;
+    List<String> html_attributions;
     String status;
     Result result;
 

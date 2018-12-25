@@ -23,7 +23,7 @@ public class PlaceDetailsApiFacade extends BaseApiFacade {
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
         urlBuilder.append("placeid=" + placeId);
         urlBuilder.append("&key=" + googleApiKeyProvider.getGoogleApiKey());
-        urlBuilder.append("$fields=" + FIELDS);
+        urlBuilder.append("&fields=" + FIELDS);
 
         return urlBuilder.toString();
     }
