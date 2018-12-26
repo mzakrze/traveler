@@ -1,16 +1,12 @@
 package pl.mzakrze.traveler.algorithm.maps_api;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.Location;
 import pl.mzakrze.traveler.config.GoogleApiKeyProvider;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @See https://developers.google.com/maps/documentation/directions/intro
@@ -28,7 +24,7 @@ public class DirectionsApiFacade extends BaseApiFacade {
     @Autowired
     private GoogleApiKeyProvider googleApiKeyProvider;  
 
-    public String fetch(Location start, Location end, List<Location> waypoints) {
+    public String fetch(Location start, Location end, List<String> waypoints) {
 
         String reqUrl = buildRequestUrl(start, end, waypoints);
 
@@ -38,7 +34,7 @@ public class DirectionsApiFacade extends BaseApiFacade {
         return this.cache;
     }
 
-    private String buildRequestUrl(Location start, Location end, List<Location> waypoints) {
+    private String buildRequestUrl(Location start, Location end, List<String> waypoints) {
         final String pipeSignEncoded = "%7C";
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
         urlBuilder.append("origin=" + start.lat + "," + start.lng);
@@ -47,14 +43,9 @@ public class DirectionsApiFacade extends BaseApiFacade {
         urlBuilder.append("&mode=" + MODE);
 
         urlBuilder.append("&waypoints=");
-        for (int i = 0; i < waypoints.size(); i++) {
-            Location p = waypoints.get(i);
-            urlBuilder.append(p.lat + "," + p.lng);
-
-            if(i != waypoints.size() - 1) {
-                urlBuilder.append(pipeSignEncoded);
-            }
-        }
+        urlBuilder.append(waypoints.stream()
+                .map(e -> "place_id:" + e)
+                .collect(Collectors.joining(pipeSignEncoded)));
 
         return urlBuilder.toString();
     }

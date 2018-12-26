@@ -1,0 +1,1 @@
+python3 ./src/main/resources/populartimes/crawler.py $1 $2
