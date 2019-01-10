@@ -22,6 +22,7 @@ public class GeneticAlgorithm {
         places.add(new FoundPlacesResult.Place(placeId1, 1, proposedTime1));
         places.add(new FoundPlacesResult.Place(placeId2, 2, proposedTime2));
 
+        result.setPlacesToVisitInOrder(places);
         return result;
     }
 }

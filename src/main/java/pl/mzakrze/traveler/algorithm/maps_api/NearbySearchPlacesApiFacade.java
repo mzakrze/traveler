@@ -13,16 +13,11 @@ public class NearbySearchPlacesApiFacade extends BaseApiFacade {
 
     public final static String BASE_URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?";
 
-    private String cache = null;
-
     public String fetch(FindRouteRequest req) {
 
         String reqUrl = buildRequestUrl(req);
 
-        if(this.cache == null) {
-            this.cache = execute(reqUrl);
-        }
-        return this.cache;
+        return execute(reqUrl);
     }
 
     private String buildRequestUrl(FindRouteRequest req) {
@@ -38,7 +33,7 @@ public class NearbySearchPlacesApiFacade extends BaseApiFacade {
         urlBuilder.append("&radius=" + radius);
         urlBuilder.append("&key=" + googleApiKeyProvider.getGoogleApiKey());
         if(req.getPlacesOfInterest().isEmpty() == false) {
-            urlBuilder.append("&keyword=");
+            urlBuilder.append("&type=");
             for (int i = 0; i < req.getPlacesOfInterest().size(); i++) {
                 String s = req.getPlacesOfInterest().get(i);
                 urlBuilder.append(s);
