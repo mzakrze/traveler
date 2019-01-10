@@ -70,7 +70,7 @@ public class FindRouteAlgorithm {
         FoundPlacesResult foundPlacesResult = new GeneticAlgorithm().solve(fetchedPlaces, placeId2DetailsMap, visitTimeMap, fromStartToPlacesDistanceMap, fromPlacesToEndDistanceMap);
 
         // 7. Fetch directions from start to end with resolved points along
-        result.directions = directionsApiFacade.fetch(req.getStartLocation(), req.getEndLocation(), foundPlacesResult);
+        result.directions = directionsApiFacade.fetch(req, foundPlacesResult);
 
         return result;
     }

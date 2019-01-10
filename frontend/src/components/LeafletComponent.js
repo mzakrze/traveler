@@ -63,22 +63,28 @@ export default class LeafletComponent extends Component {
             return "#" + r() + r() + r();
         }
 
-        let route = result.directions.routes[0];
+        for(let directions of result.directions) {
 
-        for(let leg of route.legs) {
+            let route = directions.routes[0];
 
-            let legColor = randomColor();
+            for(let leg of route.legs) {
 
-            for(let s of leg.steps) {
-                var polyline = polyUtil.decode(s.polyline.points, 5);
+                let legColor = randomColor();
 
-                var leaftletPolyline = new L.polyline(polyline, {color: legColor});
+                for(let s of leg.steps) {
+                    var polyline = polyUtil.decode(s.polyline.points, 5);
 
-                this.mymap.addLayer(leaftletPolyline);
+                    var leaftletPolyline = new L.polyline(polyline, {color: legColor});
 
-                leaftletPolyline.bindTooltip("TODO Polyline  tooltip content: " + legColor);
+                    this.mymap.addLayer(leaftletPolyline);
+
+                    leaftletPolyline.bindTooltip("TODO Polyline  tooltip content: " + legColor);
+                }
             }
+
         }
+
+
 
         // -----------------------------------------------------
 

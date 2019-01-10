@@ -4,7 +4,7 @@ import LeafletComponent from './components/LeafletComponent.js';
 import FormComponent from './components/FormComponent.js';
 
 type FindRouteResult = {
-    directions: string,
+    directions: Array<string>,
     places: string
 }
 
@@ -44,8 +44,12 @@ class App extends Component {
 
     handleFindRouteResult(result: FindRouteResult) {
         let rev = this.state.findRouteResultRev + 1;
+        let directions = [];
+        for(let d of result.directions) {
+            directions.push(JSON.parse(d))
+        }
         let res = {
-            directions: JSON.parse(result.directions),
+            directions: directions,
             places: JSON.parse(result.places)
         }
         this.setState({

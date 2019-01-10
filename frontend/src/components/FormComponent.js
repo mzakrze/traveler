@@ -135,8 +135,6 @@ export default class FormComponent extends Component {
         }
 
         let handleChange = (key, value) => {
-            //let s = Object.assign(this.state, {});
-            //s[key] = value;
             this.setState({[key]: value});
         }
 
@@ -210,6 +208,15 @@ export default class FormComponent extends Component {
         ];
     }
 
+    loadConfigFromLocalStorage() {
+        let s = JSON.parse(localStorage.getItem('config'));
+        this.setState(s)
+    }
+
+    saveConfigToLocalStorage() {
+        let stateJson = JSON.stringify(this.state);
+        localStorage.setItem('config', stateJson);
+    }
 
     render(){
         return <form>
@@ -224,6 +231,8 @@ export default class FormComponent extends Component {
             <input type="text" id="input_keywords"  onChange={(ev) => this.setState({placesKeywords: ev.target.value})}/>
             <hr />
             {this.renderFindRoutesButton()}
+            <button type="button" onClick={this.saveConfigToLocalStorage.bind(this)}>Save config</button>
+            <button type="button" onClick={this.loadConfigFromLocalStorage.bind(this)}>Load config</button>
         </form>;
     }
 }

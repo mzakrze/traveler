@@ -1,7 +1,9 @@
 package pl.mzakrze.traveler.api;
 
+import java.util.List;
+
 public class FindRouteResponse {
-    public String directions;
+    public List<String> directions;
     public String places;
     public String error;
 
@@ -13,11 +15,11 @@ public class FindRouteResponse {
         this.places = places;
     }
 
-    public String getDirections() {
+    public List<String> getDirections() {
         return directions;
     }
 
-    public void setDirections(String directions) {
+    public void setDirections(List<String> directions) {
         this.directions = directions;
     }
 
