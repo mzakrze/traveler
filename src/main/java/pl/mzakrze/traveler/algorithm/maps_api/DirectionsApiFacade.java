@@ -3,6 +3,7 @@ package pl.mzakrze.traveler.algorithm.maps_api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.Location;
+import pl.mzakrze.traveler.algorithm.ga.FoundPlacesResult;
 import pl.mzakrze.traveler.config.GoogleApiKeyProvider;
 
 import java.util.List;
@@ -24,9 +25,13 @@ public class DirectionsApiFacade extends BaseApiFacade {
     @Autowired
     private GoogleApiKeyProvider googleApiKeyProvider;  
 
-    public String fetch(Location start, Location end, List<String> waypoints) {
+    public String fetch(Location start, Location end, FoundPlacesResult result) {
 
-        String reqUrl = buildRequestUrl(start, end, waypoints);
+
+
+
+        String reqUrl = buildRequestUrl(start, end, result.getPlacesToVisitInOrder().stream().map(e -> e.id).collect(Collectors.toList()))
+                ;
 
         if(this.cache == null) {
             this.cache = execute(reqUrl);
