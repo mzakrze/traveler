@@ -6,9 +6,11 @@ import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.Location;
 import pl.mzakrze.traveler.algorithm.maps_api.model.DistanceMatrixApiResponse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,13 +28,60 @@ public class DistanceMatrixApiFacade extends BaseApiFacade {
     public DistanceMatrix fetch(List<String> placesIds) {
         Preconditions.checkArgument(placesIds.size() <= MAX_PLACES_ALLOWED, "Too much places");
 
-        DistanceMatrix result = new DistanceMatrix();
+        List<AsyncTaskData> asyncTasks = new ArrayList<>();
+
         for (String origin : placesIds) {
             List<String> destinations = placesIds.stream().filter(e -> !e.equals(origin)).collect(Collectors.toList());
-            appendToDistanceMatrix(origin, destinations, result);
+            asyncTasks.add(new AsyncTaskData(origin, destinations));
+        }
+
+
+        List<CompletableFuture<AsyncTaskResult>> futures = asyncTasks.stream()
+                .map(msg -> CompletableFuture.completedFuture(msg).thenApplyAsync(s -> executefetchDistancesAsyncTask(s.originId, s.placesId)))
+                .collect(Collectors.toList());
+
+        ConcurrentMap<DistanceMatrix.PlacesPair, Integer> concurrentMap = new ConcurrentHashMap<>();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).whenComplete((v, th) -> {
+            futures.forEach(f -> {
+                try {
+                    for (PlacesPairDuration duration : f.get().durations) {
+                        concurrentMap.put(duration.placesPair, duration.duration);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            });
+        }).join();
+
+        DistanceMatrix result = new DistanceMatrix();
+        result.matrix = new HashMap<>();
+        for (DistanceMatrix.PlacesPair placesPair : concurrentMap.keySet()) {
+            result.matrix.put(placesPair, concurrentMap.get(placesPair));
         }
 
         return result;
+    }
+
+    class AsyncTaskData {
+        String originId;
+        List<String> placesId;
+
+        public AsyncTaskData(String originId, List<String> placesId) {
+            this.originId = originId;
+            this.placesId = placesId;
+        }
+    }
+
+    class AsyncTaskResult {
+        List<PlacesPairDuration> durations;
+    }
+
+    class PlacesPairDuration {
+        DistanceMatrix.PlacesPair placesPair;
+        Integer duration;
     }
 
     private String buildRequestUrl(String origin, List<String> destinations) {
@@ -59,20 +108,28 @@ public class DistanceMatrixApiFacade extends BaseApiFacade {
         return urlBuilder.toString();
     }
 
-    public void appendToDistanceMatrix(String originId, List<String> destinationsIds, DistanceMatrix distanceMatrix) {
+    public AsyncTaskResult executefetchDistancesAsyncTask(String originId, List<String> destinationsIds) {
+        List<PlacesPairDuration> durationsResult = new ArrayList<>();
         Gson gson = new Gson();
         String response = execute(buildRequestUrl(originId, destinationsIds));
-        DistanceMatrixApiResponse result = gson.fromJson(response, DistanceMatrixApiResponse.class);
+        DistanceMatrixApiResponse apiResponse = gson.fromJson(response, DistanceMatrixApiResponse.class);
 
         // szukamy dla 1 źródła i wielu pkt docelowych => liczba wierszy = 1
         final int FROM_ORIGIN_ROW_INDEX = 0;
-        List<DistanceMatrixApiResponse.Element> elements = result.getRows().get(FROM_ORIGIN_ROW_INDEX).getElements();
+        List<DistanceMatrixApiResponse.Element> elements = apiResponse.getRows().get(FROM_ORIGIN_ROW_INDEX).getElements();
         for (int rowIndex = 0; rowIndex < elements.size(); rowIndex++) {
             DistanceMatrixApiResponse.Element element = elements.get(rowIndex);
             String destination = destinationsIds.get(rowIndex);
 
-            distanceMatrix.matrix.put(new DistanceMatrix.PlacesPair(originId, destination), element.getDuration().getValue());
+            PlacesPairDuration placesPairDuration = new PlacesPairDuration();
+            placesPairDuration.duration = element.getDuration().getValue();
+            placesPairDuration.placesPair = new DistanceMatrix.PlacesPair(originId, destination);
+            durationsResult.add(placesPairDuration);
         }
+        AsyncTaskResult asyncTaskResult = new AsyncTaskResult();
+        asyncTaskResult.durations = durationsResult;
+
+        return asyncTaskResult;
     }
 
     public Map<String, Integer> fetch(Location location, List<String> placesIds) {

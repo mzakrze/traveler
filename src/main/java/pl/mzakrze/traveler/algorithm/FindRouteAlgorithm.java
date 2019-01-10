@@ -51,9 +51,10 @@ public class FindRouteAlgorithm {
 
         // 2. Fetch distances between those places from api
         DistanceMatrixApiFacade.DistanceMatrix distanceMatrix = null;
-        if(placesIds.size() == 1){
+        if(placesIds.size() != 1){
             distanceMatrix = distanceMatrixApiFacade.fetch(placesIds);
         }
+
 
         Map<String, Integer> fromStartToPlacesDistanceMap = distanceMatrixApiFacade.fetch(req.getStartLocation(), placesIds);
         Map<String, Integer> fromPlacesToEndDistanceMap = distanceMatrixApiFacade.fetch(req.getEndLocation(), placesIds);
