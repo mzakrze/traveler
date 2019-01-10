@@ -3,7 +3,9 @@ package pl.mzakrze.traveler.algorithm.maps_api;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.api.FindRouteRequest;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 
 /**
  * @See https://developers.google.com/places/web-service/search#PlaceSearchRequests
@@ -32,6 +34,13 @@ public class NearbySearchPlacesApiFacade extends BaseApiFacade {
         urlBuilder.append("location=" + lat + "," + lng);
         urlBuilder.append("&radius=" + radius);
         urlBuilder.append("&key=" + googleApiKeyProvider.getGoogleApiKey());
+        if(req.getPlacesKeywords().isEmpty() == false) {
+            try {
+                String keyword = URLEncoder.encode(req.getPlacesKeywords(), "UTF-8");
+                urlBuilder.append("&keyword=" + keyword);
+            } catch (UnsupportedEncodingException e) { }
+
+        }
         if(req.getPlacesOfInterest().isEmpty() == false) {
             urlBuilder.append("&type=");
             for (int i = 0; i < req.getPlacesOfInterest().size(); i++) {
