@@ -49,21 +49,18 @@ public class FindRouteAlgorithm {
             return result;
         }
 
+
         // 2. Fetch distances between those places from api
         DistanceMatrixApiFacade.DistanceMatrix distanceMatrix = null;
         if(placesIds.size() != 1){
             distanceMatrix = distanceMatrixApiFacade.fetch(placesIds);
         }
-
-
         Map<String, Integer> fromStartToPlacesDistanceMap = distanceMatrixApiFacade.fetch(req.getStartLocation(), placesIds);
         Map<String, Integer> fromPlacesToEndDistanceMap = distanceMatrixApiFacade.fetch(req.getEndLocation(), placesIds);
 
+
         // 3. Fetch places details from api
-        Map<String, PlaceDetailsApiResponse> placeId2DetailsMap = placesIds.stream()
-                .collect(Collectors.toMap(
-                        placeId -> placeId,
-                        placeId -> gson.fromJson(placeDetailsApiFacade.fetch(placeId), PlaceDetailsApiResponse.class)));
+        Map<String, PlaceDetailsApiResponse> placeId2DetailsMap = placeDetailsApiFacade.fetch(placesIds);
 
         // 4. Fetch average visit time via web crawler + fill those not found
         Map<String, AvgVisitTime> visitTimeMap = avgVisitTimeCrawler.fetch(placesIds);

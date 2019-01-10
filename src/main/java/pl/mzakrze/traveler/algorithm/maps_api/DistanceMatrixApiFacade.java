@@ -43,17 +43,17 @@ public class DistanceMatrixApiFacade extends BaseApiFacade {
         ConcurrentMap<DistanceMatrix.PlacesPair, Integer> concurrentMap = new ConcurrentHashMap<>();
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()])).whenComplete((v, th) -> {
-            futures.forEach(f -> {
-                try {
-                    for (PlacesPairDuration duration : f.get().durations) {
+            try {
+                for (CompletableFuture<AsyncTaskResult> future : futures) {
+                    for (PlacesPairDuration duration : future.get().durations) {
                         concurrentMap.put(duration.placesPair, duration.duration);
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
                 }
-            });
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
         }).join();
 
         DistanceMatrix result = new DistanceMatrix();

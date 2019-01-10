@@ -22,7 +22,12 @@ public class AvgVisitTimeCrawler extends BaseApiFacade {
 
     private Map<String, AvgVisitTime> cache = new HashMap<>();
 
+    private final static Boolean isOn = false;
+
     public Map<String, AvgVisitTime> fetch(List<String> placesIds) {
+        if(isOn == false) {
+            return new HashMap<>();
+        }
         HashMap<String, AvgVisitTime> res = new HashMap<>();
 
         String jsonInput = "[" + placesIds.stream()
