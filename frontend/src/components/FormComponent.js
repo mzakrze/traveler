@@ -1,6 +1,11 @@
 /* @flow */
 import React, { Component } from 'react';
 
+
+// TODO - mapowanie place_code na postać dla użytkownika
+const SUPPORTED_PLACES_CODES = ['amusement_park','aquarium','art_gallery','bar','beauty_salon','book_store','bowling_alley','cafe','casino','church','city_hall','clothing_store','gym','hair_care','laundry','meal_takeaway','movie_rental','movie_theater','museum','night_club','park','pharmacy','store','supermarket','travel_agency', 'zoo']
+
+
 export default class FormComponent extends Component {
     props: Props;
     state: State;
@@ -129,11 +134,11 @@ export default class FormComponent extends Component {
 
 
     render(){
+
+
         return <form>
             {this.renderStartEndTripLocationsInput()}
-            {this.renderCheckbox('restaurants')}
-            {this.renderCheckbox('liquor stores')}
-            {this.renderCheckbox('museums')}
+            {SUPPORTED_PLACES_CODES.map(place_code => this.renderCheckbox(place_code))}
             {this.renderFindRoutesButton()}
         </form>;
     }

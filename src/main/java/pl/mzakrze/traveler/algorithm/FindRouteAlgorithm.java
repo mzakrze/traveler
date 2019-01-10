@@ -50,16 +50,18 @@ public class FindRouteAlgorithm {
 //                        placeId -> placeId,
 //                        placeId -> gson.fromJson(placeDetailsApiFacade.fetch(placeId), PlaceDetailsApiResponse.class)));
 
+        // 4. Fetch average visit time via web crawler + fill those not found
         Map<String, AvgVisitTime> visitTimeMap = avgVisitTimeCrawler.fetch(placesIds);
+        visitTimeMap = new PlaceVisitTimeHardMap().fillEmptyVisitTimes(visitTimeMap, fetchedPlaces);
 
-        // 4. Create graph representation
+        // 5. Create graph representation
         // TODO
 
-        // 5. Solve graph(find cheapest route) via genetic algorithm
+        // 6. Solve graph(find cheapest route) via genetic algorithm
         // TODO -  mocked
         List<String> selectedWaypoints = placesIds.subList(2, 6);
 
-        // 6. Fetch directions from start to end with resolved points along
+        // 7. Fetch directions from start to end with resolved points along
         result.directions = directionsApiFacade.fetch(req.getStartLocation(), req.getEndLocation(), selectedWaypoints);
 
         return result;
