@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class PlaceVisitTimeHardMap {
 
-    Map<String, Integer> PLACE_TYPE_AVG_VISIT_TIME_MAP = ImmutableMap.<String, Integer>builder()
+    public final static Map<String, Integer> PLACE_TYPE_AVG_VISIT_TIME_MAP = ImmutableMap.<String, Integer>builder()
         .put("amusement_park", 20)
         .put("aquarium", 20)
         .put("art_gallery", 60)
@@ -42,6 +42,8 @@ public class PlaceVisitTimeHardMap {
         .put("zoo", 60)
         .build();
 
+    public final static Integer OTHER_TYPE_VISIT_TIME = 30;
+
 
     public Map<String, AvgVisitTime> fillEmptyVisitTimes(Map<String, AvgVisitTime> avgVisitTimeMap, NearbySeachPlacesApiResponse places) {
 
@@ -51,7 +53,10 @@ public class PlaceVisitTimeHardMap {
                 continue;
             }
 
-            double avgVisitTimeMinutes = result.getTypes().stream().mapToDouble(type -> PLACE_TYPE_AVG_VISIT_TIME_MAP.get(type)).average().getAsDouble();
+            double avgVisitTimeMinutes = result.getTypes().stream()
+                    .filter(type -> PLACE_TYPE_AVG_VISIT_TIME_MAP.containsKey(type))
+                    .mapToDouble(type -> PLACE_TYPE_AVG_VISIT_TIME_MAP.get(type)).average()
+                    .orElseGet(() -> OTHER_TYPE_VISIT_TIME);
 
             AvgVisitTime avgVisitTime = new AvgVisitTime();
             avgVisitTime.setFromMinutes(avgVisitTimeMinutes * Configuration.AVG_TIME_FROM_SCALER);

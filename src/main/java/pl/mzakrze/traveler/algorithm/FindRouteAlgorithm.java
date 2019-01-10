@@ -44,8 +44,17 @@ public class FindRouteAlgorithm {
 
         List<String> placesIds = fetchedPlaces.results.stream().map(e -> e.getPlace_id()).collect(Collectors.toList());
 
+        if(placesIds.size() == 0) {
+            result.error = "No places found, please unrestrict your searches";
+            return result;
+        }
+
         // 2. Fetch distances between those places from api
-        DistanceMatrixApiFacade.DistanceMatrix distanceMatrix = distanceMatrixApiFacade.fetch(placesIds);
+        DistanceMatrixApiFacade.DistanceMatrix distanceMatrix = null;
+        if(placesIds.size() == 1){
+            distanceMatrix = distanceMatrixApiFacade.fetch(placesIds);
+        }
+
         Map<String, Integer> fromStartToPlacesDistanceMap = distanceMatrixApiFacade.fetch(req.getStartLocation(), placesIds);
         Map<String, Integer> fromPlacesToEndDistanceMap = distanceMatrixApiFacade.fetch(req.getEndLocation(), placesIds);
 

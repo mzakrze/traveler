@@ -3,6 +3,7 @@ package pl.mzakrze.traveler.api;
 public class FindRouteResponse {
     public String directions;
     public String places;
+    public String error;
 
     public String getPlaces() {
         return places;
@@ -18,5 +19,13 @@ public class FindRouteResponse {
 
     public void setDirections(String directions) {
         this.directions = directions;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

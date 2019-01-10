@@ -13,11 +13,16 @@ export default class FormComponent extends Component {
     constructor(props: Props){
         super(props);
         this.state = {
-            checkedCheckboxes: [],
+            selectedPlacesTypes: [],
+            acceptedTravelModes: [],
             startLocation: null,
             awaitingForStartLocation: false,
             endLocation: null,
             awaitingForEndLocation: false,
+            startTimeHour: '',
+            startTimeMinute: '',
+            tripDuration: '',
+            placesKeywords: '',
         }
     }
 
@@ -45,7 +50,7 @@ export default class FormComponent extends Component {
 
     renderCheckbox(name: string) {
         let handle = (ev) => {
-            let checked = this.state.checkedCheckboxes.slice()
+            let checked = this.state.selectedPlacesTypes.slice()
             if(ev.target.checked) {
                 checked.push(name);
             } else {
@@ -53,7 +58,7 @@ export default class FormComponent extends Component {
                 checked.splice(index, 1);
             }
             this.setState({
-                checkedCheckboxes: checked
+                selectedPlacesTypes: checked
             });
         }
         return [
@@ -64,11 +69,33 @@ export default class FormComponent extends Component {
     }
 
     renderFindRoutesButton() {
+        let validate = () => {
+            let msg = '';
+            if(this.state.startLocation == null) {
+                msg += 'Set your start location\n';
+            }
+            if(this.state.endLocation == null) {
+                msg += 'Set your end location\n';
+            }
+            if(this.state.tripDuration == '') {
+                msg += 'Set you trip duration\n';
+            }
+
+            if(msg != '') {
+                alert(msg)
+            }
+            return msg == ''; // no alert = validation ok
+        }
+
         let send = () => {
             let data = {
-                placesOfInterest: this.state.checkedCheckboxes,
+                placesOfInterest: this.state.selectedPlacesTypes,
                 startLocation: this.state.startLocation,
-                endLocation: this.state.endLocation
+                endLocation: this.state.endLocation,
+                tripStart: this.state.startTimeHour == '' && this.state.startTimeMinute == '' ? null : {hour: this.state.startTimeHour, minute: this.state.startTimeMinute},
+                tripDuration: this.state.tripDuration,
+                placesKeywords: this.state.placesKeywords,
+                travelModes: this.state.acceptedTravelModes
             }
             fetch('/api/maps/find_route', {
                 method: 'POST',
@@ -82,10 +109,14 @@ export default class FormComponent extends Component {
                     return response.json();
                 })
                 .then((response) => {
-                    this.props.notifyFindRouteResult(response);
+                    if(response.error != null) {
+                       alert(response.error);
+                    } else {
+                        this.props.notifyFindRouteResult(response);
+                    }
                 });
         }
-        return <button type="button" onClick={send}>Ok - find optimal route</button>
+        return <button type="button" onClick={() => {if(validate()) {send()}}}>Ok - find optimal route</button>
     }
 
     renderStartEndTripLocationsInput() {
@@ -101,6 +132,32 @@ export default class FormComponent extends Component {
                 awaitingForEndLocation: true,
                 awaitingForStartLocation: false,
             });
+        }
+
+        let handleChange = (key, value) => {
+            //let s = Object.assign(this.state, {});
+            //s[key] = value;
+            this.setState({[key]: value});
+        }
+
+        let renderTravelModeCheckbox = (mode) => {
+            let handle = (ev) => {
+                let checked = this.state.acceptedTravelModes.slice()
+                if(ev.target.checked) {
+                    checked.push(mode);
+                } else {
+                    let index = checked.indexOf(mode);
+                    checked.splice(index, 1);
+                }
+                this.setState({
+                    acceptedTravelModes: checked
+                });
+            }
+            return [
+                <input type="checkbox" id={mode} name={mode} value={mode} onClick={handle}/>,
+                <label htmlFor={mode}>{mode}</label>,
+                <br />
+            ];
         }
 
         return [
@@ -129,18 +186,44 @@ export default class FormComponent extends Component {
                 <button type="button" onClick={handleNewEndLocation}>Update end position</button>
             ,
             <hr />,
+            <p>Your trip start time: </p>,
+            <label htmlFor="input_start_time_hour">Hour:</label>,
+            <input type="text" id="input_start_time_hour" onChange={(ev) => handleChange('startTimeHour', ev.target.value)} />,
+            <label htmlFor="input_start_time_minute">Minute:</label>,
+            <input type="text" id="input_start_time_minute" onChange={(ev) => handleChange('startTimeMinute', ev.target.value)} />,
+            (this.state.startTimeHour == '' && this.state.startTimeMinute == '' ?
+                            <p style={{color: 'orange'}}>You havent set start time(assuming right now)</p>
+                            :
+                            null),
+            <hr />,
+            <label htmlFor="input_duration_minute">Expected trip duration in minutes:</label>,
+            <input type="text" id="input_duration_minute"  onChange={(ev) => handleChange('tripDuration', ev.target.value)}/>,
+            (this.state.tripDuration == '' ?
+                                        <p style={{color: 'red'}}>You havent set your trip duration</p>
+                                        :
+                                        null),
+            <hr />,
+            <p>Choose accepted modes of transportation: </p>,
+            renderTravelModeCheckbox('driving'),
+            renderTravelModeCheckbox('bicycling'),
+            renderTravelModeCheckbox('transit'),
         ];
     }
 
 
     render(){
-
-
         return <form>
             {this.renderStartEndTripLocationsInput()}
-            {SUPPORTED_PLACES_CODES.map(place_code => this.renderCheckbox(place_code))}
+            <p>Choose places of interest: </p>
+            <div style={{height: '200px', overflow: 'scroll'}}>
+                {SUPPORTED_PLACES_CODES.map(place_code => this.renderCheckbox(place_code))}
+            </div>
+            <hr />
+            <p>Additional keywords for finding places: </p>
+            <label htmlFor="input_keywords">Search for places:</label>
+            <input type="text" id="input_keywords"  onChange={(ev) => this.setState({placesKeywords: ev.target.value})}/>
+            <hr />
             {this.renderFindRoutesButton()}
         </form>;
     }
-
 }
