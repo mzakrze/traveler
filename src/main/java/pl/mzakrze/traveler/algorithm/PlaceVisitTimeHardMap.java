@@ -45,7 +45,7 @@ public class PlaceVisitTimeHardMap {
     public final static Integer OTHER_TYPE_VISIT_TIME = 30;
 
 
-    public Map<String, AvgVisitTime> fillEmptyVisitTimes(Map<String, AvgVisitTime> avgVisitTimeMap, NearbySeachPlacesApiResponse places) {
+    public static Map<String, AvgVisitTime> fillEmptyVisitTimes(Map<String, AvgVisitTime> avgVisitTimeMap, NearbySeachPlacesApiResponse places) {
 
         for (NearbySeachPlacesApiResponse.Result result : places.results) {
 

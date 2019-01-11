@@ -1,10 +1,13 @@
 package pl.mzakrze.traveler.algorithm.ga;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.util.List;
 
 public class FoundPlacesResult {
 
-    private List<Place> placesToVisitInOrder;
+    public List<Place> placesToVisitInOrder;
 
     public List<Place> getPlacesToVisitInOrder() {
         return placesToVisitInOrder;
@@ -14,10 +17,12 @@ public class FoundPlacesResult {
         this.placesToVisitInOrder = placesToVisitInOrder;
     }
 
+    @Data
+    @EqualsAndHashCode
     public static class Place {
         public String id;
-        public Integer order; // redundancja(bo kolejność jest już w liście), ale dla kompletności
-        public Integer proposedTime;
+        @EqualsAndHashCode.Exclude public Integer order; // redundancja(bo kolejność jest już w liście), ale dla kompletności
+        @EqualsAndHashCode.Exclude public Integer proposedTime;
 
         public Place(String id, Integer order, Integer proposedTime) {
             this.id = id;

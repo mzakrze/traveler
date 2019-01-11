@@ -2,6 +2,7 @@ package pl.mzakrze.traveler.algorithm.maps_api;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 import pl.mzakrze.traveler.algorithm.Location;
 import pl.mzakrze.traveler.algorithm.maps_api.model.DistanceMatrixApiResponse;
@@ -152,8 +153,9 @@ public class DistanceMatrixApiFacade extends BaseApiFacade {
     }
 
     public static class DistanceMatrix {
-        Map<PlacesPair, Integer> matrix = new HashMap<>();
+        public Map<PlacesPair, Integer> matrix = new HashMap<>();
 
+        @Data
         public static class PlacesPair {
             String placeIdFrom;
             String placeIdTo;

@@ -33,14 +33,8 @@ public class FindRouteAlgorithm {
     @Autowired
     AvgVisitTimeCrawler avgVisitTimeCrawler;
 
-    FindRouteResponse resultCache = null;
-
     public FindRouteResponse handleFindRouteRequest(FindRouteRequest req) {
         Gson gson = new Gson();
-
-        if(resultCache != null) {
-            return resultCache;
-        }
 
         FindRouteResponse result = new FindRouteResponse();
         result.setStartLocation(req.getStartLocation());
@@ -75,13 +69,12 @@ public class FindRouteAlgorithm {
         visitTimeMap = new PlaceVisitTimeHardMap().fillEmptyVisitTimes(visitTimeMap, fetchedPlaces);
 
         // 5. Find "best" route
-        FoundPlacesResult foundPlacesResult = new GeneticAlgorithm().solve(fetchedPlaces, placeId2DetailsMap, visitTimeMap, fromStartToPlacesDistanceMap, fromPlacesToEndDistanceMap);
+        FoundPlacesResult foundPlacesResult = new GeneticAlgorithm(req, fetchedPlaces, placeId2DetailsMap, visitTimeMap, distanceMatrix,  fromStartToPlacesDistanceMap, fromPlacesToEndDistanceMap).solve();
         result.selectedPlaces = foundPlacesResult;
 
         // 7. Fetch directions from start to end with resolved points along
         result.directions = directionsApiFacade.fetch(req, foundPlacesResult);
 
-        resultCache = result;
         return result;
     }
 }
