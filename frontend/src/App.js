@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import LeafletComponent from './components/LeafletComponent.js';
 import FormComponent from './components/FormComponent.js';
+import ResultPresenterComponent from './components/ResultPresenterComponent.js';
 
-type FindRouteResult = {
+export type FindRouteResult = {
     directions: Array<string>,
-    places: string
+    selectedPlaces: Array<any>,
+    places: any,
+    startLocation: any,
+    endLocation: any,
+    // TODO - dodać place details
 }
 
 class App extends Component {
@@ -21,6 +26,7 @@ class App extends Component {
             endLocation: null,
             findRouteResult: null,
             findRouteResultRev: 0,
+            resultPresenterVisible: false,
         }
     }
 
@@ -50,15 +56,37 @@ class App extends Component {
         }
         let res = {
             directions: directions,
-            places: JSON.parse(result.places)
+            places: JSON.parse(result.places),
+            selectedPlaces: result.selectedPlaces,
+            startLocation: result.startLocation,
+            endLocation:  result.endLocation
         }
         this.setState({
             findRouteResult: res,
             findRouteResultRev: rev,
+            resultPresenterVisible: true,
         });
     }
 
+    getColor(index) {
+        // wybrane takie bardziej kontrastujące
+        const colors = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff'];
+        let randomColor = () => {
+            const possible = "0123456789abcdef";
+            let r = () => possible[Math.floor(Math.random() * 16)];
+            return "#" + r() + r() + r();
+        }
+        if(colors.length <= index) {
+            let c = randomColor()
+            colors.push(c);
+            return c;
+        }
+        return colors[index];
+    }
+
     render() {
+        let formComponentStyleDisplay = this.state.resultPresenterVisible ? 'none' : 'inline-block';
+        let resultPresenterStyleDisplay = this.state.resultPresenterVisible == false ? 'none' : 'inline-block';
         return  <div>
            <h2> Title to be done </h2>
            <span>
@@ -69,15 +97,23 @@ class App extends Component {
                         endLocation={this.state.endLocation}
                         findRouteResult={this.state.findRouteResult}
                         findRouteResultRev={this.state.findRouteResultRev}
+                        getColor={this.getColor}
                         />
                </div>
-               <div style={{display:'inline-block', width: '600px'}}>
+               <div style={{display:formComponentStyleDisplay, width: '600px'}}>
                    <FormComponent
                         lastMapClickCoords={this.state.lastMapClickCoords}
                         notifyNewStartLocation={this.handleNewStartLocation.bind(this)}
                         notifyNewEndLocation={this.handleNewEndLocation.bind(this)}
                         notifyFindRouteResult={this.handleFindRouteResult.bind(this)}
                          />
+               </div>
+               <div style={{display:resultPresenterStyleDisplay, width: '600px'}}>
+                  <ResultPresenterComponent
+                       notifyChangeScreen={() => this.setState({resultPresenterVisible: false})}
+                       result={this.state.findRouteResult}
+                       getColor={this.getColor}
+                        />
                </div>
            </span>
         </div>;

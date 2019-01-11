@@ -88,6 +88,11 @@ export default class FormComponent extends Component {
         }
 
         let send = () => {
+            if(this.cache != null) {
+                this.props.notifyFindRouteResult(this.cache);
+                return;
+            }
+
             let data = {
                 placesOfInterest: this.state.selectedPlacesTypes,
                 startLocation: this.state.startLocation,
@@ -113,6 +118,7 @@ export default class FormComponent extends Component {
                        alert(response.error);
                     } else {
                         this.props.notifyFindRouteResult(response);
+                        this.cache = response;
                     }
                 });
         }

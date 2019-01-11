@@ -7,6 +7,8 @@ const L = window.L;
 
 var polyUtil = require('polyline-encoded');
 
+
+
 export default class LeafletComponent extends Component {
 
     mymap: any;
@@ -55,21 +57,18 @@ export default class LeafletComponent extends Component {
         }
     }
 
+
+
     plotFindRoutesResponse(result) {
-
-        let randomColor = () => {
-            const possible = "0123456789abcdef";
-            let r = () => possible[Math.floor(Math.random() * 16)];
-            return "#" + r() + r() + r();
-        }
-
+        let colorIndex = 0;
         for(let directions of result.directions) {
 
             let route = directions.routes[0];
 
             for(let leg of route.legs) {
 
-                let legColor = randomColor();
+                let legColor = this.props.getColor(colorIndex);
+                colorIndex++;
 
                 for(let s of leg.steps) {
                     var polyline = polyUtil.decode(s.polyline.points, 5);
@@ -91,8 +90,15 @@ export default class LeafletComponent extends Component {
         let places = result.places;
 
         console.log(places)
+        console.log(result.selectedPlaces.placesToVisitInOrder.map(e => e.id))
 
         for(let r of places.results) {
+
+            let ord = result.selectedPlaces.placesToVisitInOrder;
+            if(result.selectedPlaces.placesToVisitInOrder.map(e => e.id).includes(r.place_id) == false) {
+                continue;
+            }
+
 
             let latlng = r.geometry.location;
             let name = r.name;
@@ -107,6 +113,21 @@ export default class LeafletComponent extends Component {
             p.openOn(this.mymap);
         }
 
+
+        // -----------------------------------------------------
+        const popupOptions = {
+            closeOnClick: false,
+            autoClose: false
+        };
+        this.startLocationPopup = new L.popup(popupOptions)
+                    .setLatLng(result.startLocation)
+                    .setContent('Start location');
+        this.startLocationPopup.openOn(this.mymap);
+
+        this.endLocationPopup = new L.popup(popupOptions)
+                    .setLatLng(result.endLocation)
+                    .setContent('End location');
+        this.endLocationPopup.openOn(this.mymap);
     }
 
 
