@@ -115,7 +115,7 @@ export default class FormComponent extends Component {
                         this.props.notifyFindRouteResult(response);
                     }
                 });
-            alert("Please wait ... max 10 seconds")
+            alert("Please wait ... (should take about 10 seconds)")
         }
         return <button type="button" onClick={() => {if(validate()) {send()}}}>Do find route</button>
     }

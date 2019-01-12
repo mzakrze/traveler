@@ -60,6 +60,11 @@ public class GeneticAlgorithm {
 
             currentGeneration = selection(currentGeneration);
 
+            OptionalDouble avgGeneration = currentGeneration.stream().mapToInt(e -> e.placesToVisitInOrder.size()).average();
+            OptionalDouble fitness = currentGeneration.stream().mapToLong(e -> fitnessFunction(e)).average();
+            System.out.println("Places no: " + avgGeneration);
+            System.out.println("Fitness: " + fitness);
+
             List<FoundPlacesResult> newGeneration = crossover(currentGeneration);
 
             newGeneration = mutate(newGeneration);
@@ -106,13 +111,12 @@ public class GeneticAlgorithm {
     }
 
     private Long fitnessFunction(FoundPlacesResult result) {
-
         long fitness = 0;
 
         // 1. nagrody
         // 1.1 za liczbę miejsc
         int placesNo = result.placesToVisitInOrder.size();
-        fitness += 10 * placesNo * placesNo;
+        fitness += placesNo * placesNo;
         // 1.2 za "jakość" miejsc
         fitness += result.placesToVisitInOrder.stream()
                 .map(place -> place.id)
@@ -120,20 +124,22 @@ public class GeneticAlgorithm {
                 .filter(placeDetails -> placeDetails.getResult().getRating() != null)
                 .mapToInt(placeDetails -> placeDetails.getResult().getRating().intValue())
                 .average().orElseGet(() -> 0.0) * Constants.PLACES_QUALITY_COEF;
-        // 1.3 za "różnorodność" miejsc
+        // 1.3 za spełnienie typu miejsc
         long distinctPlacesTypesVisited = result.placesToVisitInOrder.stream()
                 .map(place -> place.id)
                 .map(placeId2DetailsMap::get)
                 .map(placeDetails -> placeDetails.getResult().getTypes())
-                .flatMap(List::stream)
-                .distinct()
-                .count();
-        fitness += distinctPlacesTypesVisited * Constants.DISTINCT_PLACES_TYPES_COEF;
+                .mapToLong(typeList -> typeList.stream().filter(type -> request.getPlacesOfInterest().contains(type)).count())
+                .sum();
+        fitness += distinctPlacesTypesVisited * 25; //Constants.DISTINCT_PLACES_TYPES_COEF;
         // 1.4 za spełnienie "keyword'a" z request'a
         boolean hardcodedKeywordFulfilled = result.placesToVisitInOrder.stream()
                 .map(place -> place.id)
                 .map(placeId2DetailsMap::get)
                 .anyMatch(placeDetails -> placeDetails.getHtml_attributions().contains(request.getPlacesKeywords()));
+        if(hardcodedKeywordFulfilled) {
+            fitness += 10;
+        }
 
         // 2. kary
         // 2.1 za czas
@@ -152,7 +158,7 @@ public class GeneticAlgorithm {
         totalTime += fromPlacesToEndDistanceMap.get(result.placesToVisitInOrder.get(result.placesToVisitInOrder.size() - 1).id);
 
         // czasem zdarza się przekręcić int'a
-        fitness -= Math.abs(Math.abs(5 * Math.abs(request.getTripDuration() - totalTime) * Math.abs(request.getTripDuration() - totalTime)));
+        fitness -= Math.abs(Math.abs(15 * Math.abs(request.getTripDuration() - totalTime) *  Math.abs(request.getTripDuration() - totalTime) * Math.abs(request.getTripDuration() - totalTime)));
 
         return fitness;
     }
@@ -179,6 +185,21 @@ public class GeneticAlgorithm {
                     singleIndividual.placesToVisitInOrder.remove(toRemoveIndex);
                 }
                 assertIsOk(singleIndividual.placesToVisitInOrder);
+            } else {
+                // add place
+                List<String> notIncludedPlacesIds = new ArrayList<>();
+                for (NearbySeachPlacesApiResponse.Result place : fetchedPlaces.results) {
+                    if(singleIndividual.placesToVisitInOrder.stream().filter(e -> e.id.equals(place.getPlace_id())).findAny().isPresent() == false) {
+                        notIncludedPlacesIds.add(place.getPlace_id());
+                    }
+                }
+                if(notIncludedPlacesIds.isEmpty() == false) {
+                    String placeIdToAdd = notIncludedPlacesIds.get(randomSeed.nextInt(notIncludedPlacesIds.size()));
+                    int order = singleIndividual.placesToVisitInOrder.size();
+                    AvgVisitTime avgVisitTime = visitTimeMap.get(placeIdToAdd);
+                    double time = (avgVisitTime.getFromMinutes() + avgVisitTime.getToMinutes()) / 2.0;
+                    singleIndividual.placesToVisitInOrder.add(new FoundPlacesResult.Place(placeIdToAdd, order, (int) time));
+                }
             }
         }
 
@@ -187,7 +208,7 @@ public class GeneticAlgorithm {
 
     private List<FoundPlacesResult> selection(List<FoundPlacesResult> generation) {
         List<FoundPlacesResult> afterSelection = generation.stream()
-                .sorted((r1, r2) -> -1 * Long.compare(fitnessFunction(r1), fitnessFunction(r2)))
+                .sorted((r1, r2) -> Long.compare(fitnessFunction(r1), fitnessFunction(r2)))
                 .collect(Collectors.toList())
                 .subList(0, Constants.POPULATION_SIZE);
         Collections.shuffle(afterSelection);
@@ -203,19 +224,19 @@ public class GeneticAlgorithm {
             List<FoundPlacesResult.Place> parent1 = generation.get(randomSeed.nextInt(generation.size())).placesToVisitInOrder;
             List<FoundPlacesResult.Place> parent2 = generation.get(randomSeed.nextInt(generation.size())).placesToVisitInOrder;
 
-            int parent1Rnd1 = randomSeed.nextInt(parent1.size());
-            int parent1Rnd2 = randomSeed.nextInt(parent1.size());
-            int parent2Rnd1 = randomSeed.nextInt(parent2.size());
-            int parent2Rnd2 = randomSeed.nextInt(parent2.size());
-            List<FoundPlacesResult.Place> places1 = parent1.subList(Math.min(parent1Rnd1, parent1Rnd2), Math.max(parent1Rnd1, parent1Rnd2));
-            List<FoundPlacesResult.Place> places2 = parent2.subList(Math.min(parent2Rnd1, parent2Rnd2), Math.max(parent2Rnd1, parent2Rnd2));
-
             List<FoundPlacesResult.Place> resultPlaces = new ArrayList<>();
-            resultPlaces.addAll(places1);
-            resultPlaces.addAll(places2);
-
-            if(resultPlaces.isEmpty()) {
-                resultPlaces.add((randomSeed.nextBoolean() ? parent1 : parent2).get(0));
+            int min = (parent1.size() + parent2.size()) / 2;
+            int max = (parent1.size() + parent2.size());
+            int placesNo = randomSeed.nextInt(max - min) + min;
+            for(int i = 0; i < placesNo; i++) {
+                FoundPlacesResult.Place toAdd = null;
+                if(randomSeed.nextBoolean()) {
+                    toAdd = parent1.get(randomSeed.nextInt(parent1.size()));
+                } else {
+                    toAdd = parent2.get(randomSeed.nextInt(parent2.size()));
+                }
+                FoundPlacesResult.Place place = new FoundPlacesResult.Place(toAdd.id, i, toAdd.proposedTime);
+                resultPlaces.add(place);
             }
 
             FoundPlacesResult child = new FoundPlacesResult();
