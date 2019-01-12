@@ -77,7 +77,7 @@ export default class LeafletComponent extends Component {
 
                     this.mymap.addLayer(leaftletPolyline);
 
-                    leaftletPolyline.bindTooltip("TODO Polyline  tooltip content: " + legColor);
+                    // leaftletPolyline.bindTooltip("TODO Polyline  tooltip content: " + legColor);
                 }
             }
 
@@ -101,7 +101,8 @@ export default class LeafletComponent extends Component {
 
 
             let latlng = r.geometry.location;
-            let name = r.name;
+            let proposedTime = result.selectedPlaces.placesToVisitInOrder.find(e => e.id == r.place_id).proposedTime;
+            let name = "<p><b>" + r.name + "</b> " + proposedTime + " minutes (" + r.types.join() + ")" + (r.rating != null ? "\nrating:" + r.rating : "") + "</p>";
 
             let p = new L.popup({
                     closeOnClick: false,

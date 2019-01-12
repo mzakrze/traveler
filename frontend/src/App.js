@@ -13,6 +13,8 @@ export type FindRouteResult = {
     // TODO - dodać place details
 }
 
+const APP_INSTRUCTIONS = "To set your start/end location please:\n - click on 'Set your start location'\n - left click on map"
+
 class App extends Component {
 
     props: Props;
@@ -88,8 +90,9 @@ class App extends Component {
         let formComponentStyleDisplay = this.state.resultPresenterVisible ? 'none' : 'inline-block';
         let resultPresenterStyleDisplay = this.state.resultPresenterVisible == false ? 'none' : 'inline-block';
         return  <div>
-           <h2> Title to be done </h2>
            <span>
+            <button type="button" onClick={() => alert(APP_INSTRUCTIONS)}> Show instructions </button>
+            <br />
                <div style={{display:'inline-block', marginRight:'20px'}}>
                    <LeafletComponent
                         handleClickOnMap={this.handleClickOnMap.bind(this)}

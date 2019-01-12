@@ -115,8 +115,9 @@ export default class FormComponent extends Component {
                         this.props.notifyFindRouteResult(response);
                     }
                 });
+            alert("Please wait ... max 10 seconds")
         }
-        return <button type="button" onClick={() => {if(validate()) {send()}}}>Ok - find optimal route</button>
+        return <button type="button" onClick={() => {if(validate()) {send()}}}>Do find route</button>
     }
 
     renderStartEndTripLocationsInput() {
@@ -140,6 +141,7 @@ export default class FormComponent extends Component {
 
         let renderTravelModeCheckbox = (mode) => {
             let handle = (ev) => {
+                alert("Warning: \nthis makes no effect(currently not implemented)")
                 let checked = this.state.acceptedTravelModes.slice()
                 if(ev.target.checked) {
                     checked.push(mode);
@@ -231,8 +233,6 @@ export default class FormComponent extends Component {
             <input type="text" id="input_keywords"  onChange={(ev) => this.setState({placesKeywords: ev.target.value})}/>
             <hr />
             {this.renderFindRoutesButton()}
-            <button type="button" onClick={this.saveConfigToLocalStorage.bind(this)}>Save config</button>
-            <button type="button" onClick={this.loadConfigFromLocalStorage.bind(this)}>Load config</button>
         </form>;
     }
 }
