@@ -1,6 +1,7 @@
 package pl.mzakrze.traveler.algorithm.maps_api;
 
 import org.springframework.stereotype.Component;
+import pl.mzakrze.traveler.algorithm.Configuration;
 import pl.mzakrze.traveler.api.FindRouteRequest;
 
 import java.io.UnsupportedEncodingException;
@@ -23,16 +24,13 @@ public class NearbySearchPlacesApiFacade extends BaseApiFacade {
     }
 
     private String buildRequestUrl(FindRouteRequest req) {
-        // FIXME - nie będzie działać jeśli start location blisko end location
         // Heuristic#1: search only for places "close" to / between start and end locations
         BigDecimal lat = req.getStartLocation().lat.add(req.getEndLocation().lat).divide(new BigDecimal("2"));
         BigDecimal lng = req.getStartLocation().lng.add(req.getEndLocation().lng).divide(new BigDecimal("2"));
 
-        BigDecimal radius = new BigDecimal("5000"); // [m]
-
         StringBuilder urlBuilder = new StringBuilder(BASE_URL);
         urlBuilder.append("location=" + lat + "," + lng);
-        urlBuilder.append("&radius=" + radius);
+        urlBuilder.append("&radius=" + Configuration.SEARCH_PLACES_RADIUS);
         urlBuilder.append("&key=" + googleApiKeyProvider.getGoogleApiKey());
         if(req.getPlacesKeywords().isEmpty() == false) {
             try {

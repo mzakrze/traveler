@@ -63,6 +63,7 @@ public class FindRouteAlgorithm {
 
         // 3. Fetch places details from api
         Map<String, PlaceDetailsApiResponse> placeId2DetailsMap = placeDetailsApiFacade.fetch(placesIds);
+        result.placeId2DetailsMap = placeId2DetailsMap;
 
         // 4. Fetch average visit time via web crawler + fill those not found
         Map<String, AvgVisitTime> visitTimeMap = avgVisitTimeCrawler.fetch(placesIds);
