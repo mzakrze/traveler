@@ -43,6 +43,16 @@ public class GeneticAlgorithm {
 
     public FoundPlacesResult solve() {
 
+        if(fetchedPlaces.results.size() == 1) {
+            NearbySeachPlacesApiResponse.Result singlePlace = fetchedPlaces.results.get(0);
+            FoundPlacesResult result = new FoundPlacesResult();
+            result.placesToVisitInOrder = new ArrayList<>();
+            AvgVisitTime avgVisitTime = visitTimeMap.get(singlePlace.getPlace_id());
+            double time = (avgVisitTime.getFromMinutes() + avgVisitTime.getToMinutes()) / 2.0;
+            result.placesToVisitInOrder.add(new FoundPlacesResult.Place(singlePlace.getPlace_id(), 0, (int) time));
+            return result;
+        }
+
         List<FoundPlacesResult> generationZero = generateRandom(Constants.POPULATION_SIZE * 2);
 
         List<FoundPlacesResult> currentGeneration = generationZero;
