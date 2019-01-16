@@ -1,0 +1,1 @@
+{"version":3,"sources":["/home/mariusz/Documents/elka/SPDB/traveler_app/frontend/src/components/LeafletComponent.css"],"names":[],"mappings":"AAAA,iBACC,aAAc,AACd,YAAc,CACd","file":"main.8283460a.chunk.css","sourcesContent":["#leaftlet-map-id {\n\theight: 800px;\n\twidth: 1200px;\n}\n\n\n"]}
